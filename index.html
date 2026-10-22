@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Book a Service</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #13201a;
+    --muted: #5b6b62;
+    --paper: #f4f6f1;
+    --card: #ffffff;
+    --line: #d9dfd6;
+    --green: #0f8f4b;
+    --green-dark: #0a6e39;
+    --green-tint: #e3f4ea;
+    --red: #c4261d;
+    --radius: 18px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-padding-bottom: 140px; }
+  body {
+    font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--paper); color: var(--ink); min-height: 100vh;
+    display: flex; justify-content: center; font-size: 18px; line-height: 1.4;
+  }
+  .container { width: 100%; max-width: 520px; padding: 0 20px 170px; }
+
+  /* Header */
+  .header { padding: 44px 0 28px; }
+  .header h1 { font-size: 42px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; }
+  .header p { font-size: 18px; color: var(--muted); margin-top: 10px; font-weight: 500; }
+
+  /* Section headings */
+  .step { display: flex; align-items: baseline; justify-content: space-between; margin: 8px 0 14px; }
+  .step h2 { font-size: 24px; font-weight: 800; letter-spacing: -.5px; }
+  .count { font-size: 15px; font-weight: 700; color: var(--green-dark); background: var(--green-tint); padding: 5px 12px; border-radius: 100px; opacity: 0; transition: opacity .2s; }
+  .count.show { opacity: 1; }
+
+  /* Service checkbox cards */
+  .services { display: grid; gap: 12px; border: 0; }
+  .svc { position: relative; display: block; cursor: pointer; }
+  .svc input {
+    position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; cursor: pointer; margin: 0;
+  }
+  .svc-body {
+    display: flex; align-items: center; gap: 16px; min-height: 80px;
+    padding: 14px 18px 14px 14px; background: var(--card);
+    border: 2.5px solid var(--line); border-radius: var(--radius);
+    transition: border-color .15s, background .15s, transform .1s;
+  }
+  .svc:active .svc-body { transform: scale(.98); }
+  .svc-icon {
+    flex: none; width: 54px; height: 54px; border-radius: 14px; background: var(--paper);
+    display: flex; align-items: center; justify-content: center; font-size: 28px;
+    transition: background .15s;
+  }
+  .svc-name { flex: 1; font-size: 20px; font-weight: 700; letter-spacing: -.3px; line-height: 1.2; }
+  .svc-name small { display: block; font-size: 14px; font-weight: 500; color: var(--muted); margin-top: 3px; letter-spacing: 0; }
+  .box {
+    flex: none; width: 34px; height: 34px; border-radius: 10px; border: 2.5px solid #b4beb7;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    transition: background .15s, border-color .15s;
+  }
+  .box svg { width: 20px; height: 20px; stroke: #fff; stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .2s ease; }
+  .svc input:checked ~ .svc-body { border-color: var(--green); background: var(--green-tint); }
+  .svc input:checked ~ .svc-body .svc-icon { background: #fff; }
+  .svc input:checked ~ .svc-body .box { background: var(--green); border-color: var(--green); }
+  .svc input:checked ~ .svc-body .box svg { stroke-dashoffset: 0; }
+  .svc input:focus-visible ~ .svc-body { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  .err { font-size: 16px; font-weight: 600; color: var(--red); margin-top: 12px; display: none; }
+  .err.show { display: block; }
+
+  /* Address */
+  .addr-section { margin-top: 36px; }
+  .addr-box { position: relative; }
+  .addr-input {
+    width: 100%; padding: 18px; border: 2.5px solid var(--line); border-radius: var(--radius);
+    font-size: 19px; font-weight: 500; color: var(--ink); background: var(--card); outline: none;
+    font-family: inherit; resize: none; min-height: 110px; line-height: 1.4; transition: border-color .15s;
+  }
+  .addr-input:focus { border-color: var(--ink); }
+  .addr-input::placeholder { color: #93a097; }
+  .addr-input.error { border-color: var(--red); }
+  .loc-btn {
+    margin-top: 12px; width: 100%; min-height: 60px; padding: 14px 18px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    border: 2.5px solid var(--ink); border-radius: var(--radius); background: transparent; color: var(--ink);
+    font-family: inherit; font-size: 18px; font-weight: 700; cursor: pointer; transition: background .15s;
+  }
+  .loc-btn:active { background: #e6eae3; }
+  .loc-btn.loading { pointer-events: none; opacity: .75; }
+  .loc-btn svg { width: 24px; height: 24px; }
+  .spin { width: 22px; height: 22px; border: 3px solid var(--ink); border-top-color: transparent; border-radius: 50%; animation: rotate .6s linear infinite; }
+  @keyframes rotate { to { transform: rotate(360deg); } }
+  .loc-ok { font-size: 15px; font-weight: 600; color: var(--green-dark); margin-top: 10px; display: none; }
+  .loc-ok.show { display: block; }
+
+  /* Bottom action bar */
+  .bar {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 520px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(244,246,241,.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line); display: flex; gap: 12px;
+  }
+  .call-link {
+    flex: none; width: 68px; display: flex; align-items: center; justify-content: center;
+    border: 2.5px solid var(--ink); border-radius: var(--radius); color: var(--ink); background: #fff; text-decoration: none;
+  }
+  .call-link:active { background: #e6eae3; }
+  .call-link svg { width: 26px; height: 26px; }
+  .submit-btn {
+    flex: 1; min-height: 68px; padding: 12px 18px; background: var(--green); color: #fff; border: none;
+    border-radius: var(--radius); font-family: inherit; font-size: 20px; font-weight: 800; letter-spacing: -.3px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background .15s;
+  }
+  .submit-btn:active { background: var(--green-dark); }
+  .submit-btn svg { width: 26px; height: 26px; }
+  .call-link:focus-visible, .submit-btn:focus-visible, .loc-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  /* Toast */
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-140px);
+    background: var(--ink); color: #fff; padding: 16px 26px; border-radius: 14px;
+    font-size: 16px; font-weight: 600; z-index: 999; transition: transform .3s ease; max-width: 90%; text-align: center;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.bad { background: var(--red); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation-duration: 0s !important; } }
+  @media (max-width: 360px) { .header h1 { font-size: 36px; } .svc-name { font-size: 18px; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Book a Service</h1>
+    <p>Tick what you need, add your address, and send it on WhatsApp.</p>
+  </div>
+
+  <fieldset class="services" id="services">
+    <legend class="step" style="width:100%; float:left; margin-bottom:14px;">
+      <h2>What do you need?</h2>
+      <span class="count" id="count"></span>
+    </legend>
+
+    <label class="svc"><input type="checkbox" value="AC" onchange="changed()">
+      <span class="svc-body"><span class="svc-icon">❄️</span><span class="svc-name">AC</span>
+      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
+
+    <label class="svc"><input type="checkbox" value="Fridge" onchange="changed()">
+      <span class="svc-body"><span class="svc-icon">🧊</span><span class="svc-name">Fridge</span>
+      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
+
+    <label class="svc"><input type="checkbox" value="Washing Machine" onchange="changed()">
+      <span class="svc-body"><span class="svc-icon">🧺</span><span class="svc-name">Washing Machine</span>
+      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
+
+    <label class="svc"><input type="checkbox" value="RO" onchange="changed()">
+      <span class="svc-body"><span class="svc-icon">💧</span><span class="svc-name">RO</span>
+      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
+
+    <label class="svc"><input type="checkbox" value="Geyser" onchange="changed()">
+      <span class="svc-body"><span class="svc-icon">🔥</span><span class="svc-name">Geyser</span>
+      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
+
+  </fieldset>
+  <div class="err" id="tabErr" role="alert">Please tick at least one service</div>
+
+  <div class="addr-section">
+    <div class="step"><h2>Where should we come?</h2></div>
+    <div class="addr-box">
+      <textarea class="addr-input" id="addr" placeholder="House no., street, area, city" rows="3" aria-label="Your address"></textarea>
+    </div>
+    <div class="err" id="addrErr" role="alert">Please enter your address</div>
+
+    <button class="loc-btn" id="locBtn" type="button" onclick="getLoc()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/>
+      </svg>
+      <span id="locLabel">Use my current location</span>
+    </button>
+    <div class="loc-ok" id="locOk"></div>
+
+    <!-- Hidden location fields: populated only after location permission succeeds -->
+    <input type="hidden" id="latitude" name="latitude">
+    <input type="hidden" id="longitude" name="longitude">
+    <input type="hidden" id="locationAccuracy" name="locationAccuracy">
+  </div>
+</div>
+
+<div class="bar">
+  <a href="tel:+919267001374" class="call-link" aria-label="Call us">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+    </svg>
+  </a>
+  <button class="submit-btn" type="button" onclick="send()">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    Send on WhatsApp
+  </button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  function changed() {
+    const n = getSelected().length;
+    const c = document.getElementById('count');
+    c.textContent = n + ' selected';
+    c.classList.toggle('show', n > 0);
+    if (n) document.getElementById('tabErr').classList.remove('show');
+  }
+
+  function getSelected() {
+    return [...document.querySelectorAll('#services input:checked')].map(i => i.value);
+  }
+
+  function setHiddenLocation(lat = '', lng = '', accuracy = '') {
+    document.getElementById('latitude').value = lat;
+    document.getElementById('longitude').value = lng;
+    document.getElementById('locationAccuracy').value = accuracy;
+  }
+
+  function getLoc() {
+    const btn = document.getElementById('locBtn');
+    const svg = btn.querySelector('svg');
+    const label = document.getElementById('locLabel');
+
+    if (!navigator.geolocation) { msg('Location is not supported by this browser', true); return; }
+    if (!window.isSecureContext) { msg('Location requires HTTPS or localhost', true); return; }
+
+    btn.classList.add('loading');
+    svg.style.display = 'none';
+    label.textContent = 'Finding your location…';
+
+    const s = document.createElement('div');
+    s.className = 'spin';
+    s.id = 'sp';
+    btn.prepend(s);
+
+    navigator.geolocation.getCurrentPosition(
+      async (p) => {
+        const lat = p.coords.latitude;
+        const lng = p.coords.longitude;
+        const accuracy = Math.round(p.coords.accuracy);
+
+        setHiddenLocation(lat, lng, accuracy);
+
+        try {
+          const url = `https://nominatim.openstreetmap.org/reverse?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&format=jsonv2`;
+          const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+          if (!response.ok) throw new Error('Address lookup failed');
+          const data = await response.json();
+          document.getElementById('addr').value = data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        } catch {
+          document.getElementById('addr').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        }
+
+        document.getElementById('addr').classList.remove('error');
+        document.getElementById('addrErr').classList.remove('show');
+        const ok = document.getElementById('locOk');
+        ok.textContent = `✓ Location captured (accuracy about ${accuracy} m)`;
+        ok.classList.add('show');
+        msg(`Location captured (accuracy about ${accuracy} m)`, false);
+        done('Update my location');
+      },
+      (error) => {
+        setHiddenLocation();
+        document.getElementById('locOk').classList.remove('show');
+        const messages = {
+          1: 'Location permission denied. Allow location access and try again.',
+          2: 'Location unavailable. Please enable device location services.',
+          3: 'Location timed out. Please try again.'
+        };
+        msg(messages[error.code] || 'Could not get location', true);
+        done('Use my current location');
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+    );
+
+    function done(text) {
+      const spinner = document.getElementById('sp');
+      if (spinner) spinner.remove();
+      svg.style.display = '';
+      label.textContent = text;
+      btn.classList.remove('loading');
+    }
+  }
+
+  function send() {
+    const services = getSelected();
+    const addrEl = document.getElementById('addr');
+    const addr = addrEl.value.trim();
+    let ok = true;
+
+    if (!services.length) { document.getElementById('tabErr').classList.add('show'); ok = false; }
+    if (!addr) { addrEl.classList.add('error'); document.getElementById('addrErr').classList.add('show'); ok = false; }
+
+    if (!ok) {
+      msg('Fill in the required fields', true);
+      (services.length ? addrEl : document.getElementById('services')).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const lat = document.getElementById('latitude').value;
+    const lng = document.getElementById('longitude').value;
+    const accuracy = document.getElementById('locationAccuracy').value;
+    const list = services.map((service, i) => `${i + 1}. ${service}`).join('\n');
+    const mapLink = lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : 'GPS location was not captured';
+
+    const text =
+      `*Service Booking Request*\n\n` +
+      `*Services:*\n${list}\n\n` +
+      `*Address:*\n${addr}\n\n` +
+      `*Customer GPS Location:*\n${mapLink}\n` +
+      (lat && lng
+        ? `*Coordinates:* ${lat}, ${lng}\n*Estimated accuracy:* ${accuracy} metres`
+        : '*GPS coordinates were not captured. Please confirm the address with the customer.*');
+
+    // WhatsApp opens with the message prefilled; the user must press Send.
+    const whatsappUrl = `https://wa.me/919267001374?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+  }
+
+  function msg(text, bad) {
+    const el = document.getElementById('toast');
+    el.textContent = text;
+    el.className = 'toast' + (bad ? ' bad' : '');
+    setTimeout(() => el.classList.add('show'), 10);
+    setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  document.getElementById('addr').addEventListener('input', function () {
+    this.classList.remove('error');
+    document.getElementById('addrErr').classList.remove('show');
+  });
+</script>
+</body>
+</html>
