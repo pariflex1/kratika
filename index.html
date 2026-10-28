@@ -6,181 +6,160 @@
 <title>Book a Service</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <meta property="og:image" content="https://raw.githubusercontent.com/pariflex1/kratika/refs/heads/main/og.webp" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #13201a;
-    --muted: #5b6b62;
-    --paper: #f4f6f1;
-    --card: #ffffff;
-    --line: #d9dfd6;
-    --green: #0f8f4b;
-    --green-dark: #0a6e39;
-    --green-tint: #e3f4ea;
-    --red: #c4261d;
-    --radius: 18px;
+    --ink: #17221c; --muted: #66746b; --paper: #f6f7f4; --card: #ffffff; --line: #dde2dc;
+    --green: #0f8f4b; --green-dark: #0a6e39; --green-tint: #e6f4ec; --red: #c4261d; --radius: 12px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html { scroll-padding-bottom: 140px; }
+  html, body { height: 100%; }
   body {
     font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--paper); color: var(--ink); min-height: 100vh;
-    display: flex; justify-content: center; font-size: 18px; line-height: 1.4;
+    background: var(--paper); color: var(--ink);
+    display: flex; justify-content: center; font-size: 15px; font-weight: 400; line-height: 1.4;
   }
-  .container { width: 100%; max-width: 520px; padding: 0 20px 170px; }
+  /* One-screen layout: content sits above the fixed bottom bar */
+  .container {
+    width: 100%; max-width: 520px; height: 100dvh; padding: 0 16px 82px;
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
 
-  /* Header */
-  .header { padding: 44px 0 28px; }
-  .header h1 { font-size: 42px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; }
-  .header p { font-size: 18px; color: var(--muted); margin-top: 10px; font-weight: 500; }
+  .header { padding: 22px 0 14px; }
+  .header h1 { font-size: 26px; font-weight: 600; letter-spacing: -.6px; line-height: 1.15; }
+  .header p { font-size: 14px; color: var(--muted); margin-top: 4px; }
 
-  /* Section headings */
-  .step { display: flex; align-items: baseline; justify-content: space-between; margin: 8px 0 14px; }
-  .step h2 { font-size: 24px; font-weight: 800; letter-spacing: -.5px; }
-  .count { font-size: 15px; font-weight: 700; color: var(--green-dark); background: var(--green-tint); padding: 5px 12px; border-radius: 100px; opacity: 0; transition: opacity .2s; }
+  .step { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; min-height: 22px; }
+  .step h2 { font-size: 15px; font-weight: 600; letter-spacing: -.1px; }
+  .count { font-size: 12px; font-weight: 500; color: var(--green-dark); background: var(--green-tint); padding: 2px 9px; border-radius: 100px; opacity: 0; transition: opacity .2s; }
   .count.show { opacity: 1; }
 
-  /* Service checkbox cards */
-  .services { display: grid; gap: 12px; border: 0; }
+  /* Service cards: two columns, compact */
+  .services { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .svc { position: relative; display: block; cursor: pointer; }
-  .svc input {
-    position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; cursor: pointer; margin: 0;
-  }
+  .svc:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .svc input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
   .svc-body {
-    display: flex; align-items: center; gap: 16px; min-height: 80px;
-    padding: 14px 18px 14px 14px; background: var(--card);
-    border: 2.5px solid var(--line); border-radius: var(--radius);
-    transition: border-color .15s, background .15s, transform .1s;
+    display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; padding: 8px 12px;
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 100px;
+    transition: border-color .15s, background .15s, color .15s, transform .1s;
   }
   .svc:active .svc-body { transform: scale(.98); }
-  .svc-icon {
-    flex: none; width: 54px; height: 54px; border-radius: 14px; background: var(--paper);
-    display: flex; align-items: center; justify-content: center; font-size: 28px;
-    transition: background .15s;
-  }
-  .svc-name { flex: 1; font-size: 20px; font-weight: 700; letter-spacing: -.3px; line-height: 1.2; }
-  .svc-name small { display: block; font-size: 14px; font-weight: 500; color: var(--muted); margin-top: 3px; letter-spacing: 0; }
-  .box {
-    flex: none; width: 34px; height: 34px; border-radius: 10px; border: 2.5px solid #b4beb7;
-    background: #fff; display: flex; align-items: center; justify-content: center;
-    transition: background .15s, border-color .15s;
-  }
-  .box svg { width: 20px; height: 20px; stroke: #fff; stroke-width: 3.5; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .2s ease; }
-  .svc input:checked ~ .svc-body { border-color: var(--green); background: var(--green-tint); }
-  .svc input:checked ~ .svc-body .svc-icon { background: #fff; }
-  .svc input:checked ~ .svc-body .box { background: var(--green); border-color: var(--green); }
-  .svc input:checked ~ .svc-body .box svg { stroke-dashoffset: 0; }
-  .svc input:focus-visible ~ .svc-body { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .svc-icon { flex: none; width: 26px; height: 26px; color: var(--ink); transition: color .15s; }
+  .svc-icon svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .svc-name { flex: none; font-size: 14px; font-weight: 500; line-height: 1.2; }
+  .svc input:checked ~ .svc-body { background: var(--green); border-color: var(--green); color: #fff; }
+  .svc input:checked ~ .svc-body .svc-icon { color: #fff; }
+  .svc input:focus-visible ~ .svc-body { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-  .err { font-size: 16px; font-weight: 600; color: var(--red); margin-top: 12px; display: none; }
+  .err { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
   .err.show { display: block; }
 
   /* Address */
-  .addr-section { margin-top: 36px; }
-  .addr-box { position: relative; }
+  .addr-section { margin-top: 16px; }
   .addr-input {
-    width: 100%; padding: 18px; border: 2.5px solid var(--line); border-radius: var(--radius);
-    font-size: 19px; font-weight: 500; color: var(--ink); background: var(--card); outline: none;
-    font-family: inherit; resize: none; min-height: 110px; line-height: 1.4; transition: border-color .15s;
+    width: 100%; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--radius);
+    font-size: 16px; font-weight: 400; color: var(--ink); background: var(--card); outline: none;
+    font-family: inherit; resize: none; line-height: 1.4; transition: border-color .15s; display: block;
   }
   .addr-input:focus { border-color: var(--ink); }
-  .addr-input::placeholder { color: #93a097; }
+  .addr-input::placeholder { color: #98a49b; }
   .addr-input.error { border-color: var(--red); }
   .loc-btn {
-    margin-top: 12px; width: 100%; min-height: 60px; padding: 14px 18px;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    border: 2.5px solid var(--ink); border-radius: var(--radius); background: transparent; color: var(--ink);
-    font-family: inherit; font-size: 18px; font-weight: 700; cursor: pointer; transition: background .15s;
+    margin-top: 8px; width: 100%; min-height: 42px; padding: 8px 14px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--card); color: var(--ink);
+    font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; transition: background .15s;
   }
-  .loc-btn:active { background: #e6eae3; }
+  .loc-btn:active { background: #eceee9; }
   .loc-btn.loading { pointer-events: none; opacity: .75; }
-  .loc-btn svg { width: 24px; height: 24px; }
-  .spin { width: 22px; height: 22px; border: 3px solid var(--ink); border-top-color: transparent; border-radius: 50%; animation: rotate .6s linear infinite; }
+  .loc-btn svg { width: 18px; height: 18px; }
+  .spin { width: 16px; height: 16px; border: 2px solid var(--ink); border-top-color: transparent; border-radius: 50%; animation: rotate .6s linear infinite; }
   @keyframes rotate { to { transform: rotate(360deg); } }
-  .loc-ok { font-size: 15px; font-weight: 600; color: var(--green-dark); margin-top: 10px; display: none; }
-  .loc-ok.show { display: block; }
+  .loc-ok { display: none !important; } /* status is shown in the toast and button label to save space */
 
-  /* Bottom action bar */
+  /* Bottom bar */
   .bar {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 520px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
-    background: rgba(244,246,241,.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border-top: 1px solid var(--line); display: flex; gap: 12px;
+    width: 100%; max-width: 520px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(246,247,244,.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line); display: flex; gap: 10px;
   }
   .call-link {
-    flex: none; width: 68px; display: flex; align-items: center; justify-content: center;
-    border: 2.5px solid var(--ink); border-radius: var(--radius); color: var(--ink); background: #fff; text-decoration: none;
+    flex: none; width: 48px; display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid var(--line); border-radius: 12px; color: var(--ink); background: #fff; text-decoration: none;
   }
-  .call-link:active { background: #e6eae3; }
-  .call-link svg { width: 26px; height: 26px; }
+  .call-link:active { background: #eceee9; }
+  .call-link svg { width: 20px; height: 20px; }
   .submit-btn {
-    flex: 1; min-height: 68px; padding: 12px 18px; background: var(--green); color: #fff; border: none;
-    border-radius: var(--radius); font-family: inherit; font-size: 20px; font-weight: 800; letter-spacing: -.3px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background .15s;
+    flex: 1; min-height: 48px; padding: 8px 18px; background: var(--green); color: #fff; border: none;
+    border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 500;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .15s;
   }
   .submit-btn:active { background: var(--green-dark); }
-  .submit-btn svg { width: 26px; height: 26px; }
-  .call-link:focus-visible, .submit-btn:focus-visible, .loc-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .submit-btn svg { width: 18px; height: 18px; }
+  .call-link:focus-visible, .submit-btn:focus-visible, .loc-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-  /* Toast */
   .toast {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-140px);
-    background: var(--ink); color: #fff; padding: 16px 26px; border-radius: 14px;
-    font-size: 16px; font-weight: 600; z-index: 999; transition: transform .3s ease; max-width: 90%; text-align: center;
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-140px);
+    background: var(--ink); color: #fff; padding: 10px 20px; border-radius: 12px;
+    font-size: 14px; font-weight: 500; z-index: 999; transition: transform .3s ease; max-width: 90%; text-align: center;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
   .toast.bad { background: var(--red); }
 
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation-duration: 0s !important; } }
-  @media (max-width: 360px) { .header h1 { font-size: 36px; } .svc-name { font-size: 18px; } }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
     <h1>Book a Service</h1>
-    <p>Tick what you need, add your address, and send it on WhatsApp.</p>
+    <p>Select services, add your address, send on WhatsApp.</p>
   </div>
 
-  <fieldset class="services" id="services">
-    <legend class="step" style="width:100%; float:left; margin-bottom:14px;">
-      <h2>What do you need?</h2>
-      <span class="count" id="count"></span>
-    </legend>
+  <div class="step"><h2 id="svcHead">What do you need?</h2><span class="count" id="count"></span></div>
+  <div class="services" id="services" role="group" aria-labelledby="svcHead">
 
     <label class="svc"><input type="checkbox" value="AC" onchange="changed()">
-      <span class="svc-body"><span class="svc-icon">❄️</span><span class="svc-name">AC</span>
-      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
+      <span class="svc-body">
+        <span class="svc-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="9" rx="2"/><path d="M7 9.5h10M8 17v2.5M12 17v3.5M16 17v2.5"/></svg></span>
+        <span class="svc-name">AC</span>
+      </span></label>
 
     <label class="svc"><input type="checkbox" value="Fridge" onchange="changed()">
-      <span class="svc-body"><span class="svc-icon">🧊</span><span class="svc-name">Fridge</span>
-      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
-
-    <label class="svc"><input type="checkbox" value="Washing Machine" onchange="changed()">
-      <span class="svc-body"><span class="svc-icon">🧺</span><span class="svc-name">Washing Machine</span>
-      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
+      <span class="svc-body">
+        <span class="svc-icon"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><path d="M6 10.5h12M9.5 6v1.5M9.5 13.5v3"/></svg></span>
+        <span class="svc-name">Fridge</span>
+      </span></label>
 
     <label class="svc"><input type="checkbox" value="RO" onchange="changed()">
-      <span class="svc-body"><span class="svc-icon">💧</span><span class="svc-name">RO</span>
-      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
+      <span class="svc-body">
+        <span class="svc-icon"><svg viewBox="0 0 24 24"><path d="M12 3c3 3.8 5 6.4 5 9a5 5 0 0 1-10 0c0-2.6 2-5.2 5-9z"/><path d="M9.5 13a2.5 2.5 0 0 0 2.5 2.5"/><path d="M8 21h8"/></svg></span>
+        <span class="svc-name">RO</span>
+      </span></label>
 
     <label class="svc"><input type="checkbox" value="Geyser" onchange="changed()">
-      <span class="svc-body"><span class="svc-icon">🔥</span><span class="svc-name">Geyser</span>
-      <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></span></span></label>
+      <span class="svc-body">
+        <span class="svc-icon"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="15" rx="3"/><circle cx="12" cy="8" r="2"/><path d="M9.5 13h5M10 17.5V21M14 17.5V21"/></svg></span>
+        <span class="svc-name">Geyser</span>
+      </span></label>
 
-  </fieldset>
-  <div class="err" id="tabErr" role="alert">Please tick at least one service</div>
+    <label class="svc"><input type="checkbox" value="Washing Machine" onchange="changed()">
+      <span class="svc-body">
+        <span class="svc-icon"><svg viewBox="0 0 24 24"><rect x="4" y="2.5" width="16" height="19" rx="2"/><circle cx="12" cy="13.5" r="4.5"/><path d="M7.5 6h.01M11 6h5"/></svg></span>
+        <span class="svc-name">Washing Machine</span>
+      </span></label>
+  </div>
+  <div class="err" id="tabErr" role="alert">Please select at least one service</div>
 
   <div class="addr-section">
-    <div class="step"><h2>Where should we come?</h2></div>
-    <div class="addr-box">
-      <textarea class="addr-input" id="addr" placeholder="House no., street, area, city" rows="3" aria-label="Your address"></textarea>
-    </div>
+    <div class="step"><h2>Your address</h2></div>
+    <textarea class="addr-input" id="addr" placeholder="House no., street, area, city" rows="2" aria-label="Your address"></textarea>
     <div class="err" id="addrErr" role="alert">Please enter your address</div>
 
     <button class="loc-btn" id="locBtn" type="button" onclick="getLoc()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/>
       </svg>
       <span id="locLabel">Use my current location</span>
@@ -196,7 +175,7 @@
 
 <div class="bar">
   <a href="tel:+919267001374" class="call-link" aria-label="Call us">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
     </svg>
   </a>
